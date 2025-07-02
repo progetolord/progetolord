@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CLINVET CLÍNICA VETERINÁRIA</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      background-image: url('sua-imagem.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    /* Overlay principal do app */
+    .overlay {
+      background-color: rgba(255, 255, 255, 0.95);
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* Vai esconder inicialmente até login */
+      display: none;
+    }
+    .topo {
+      font-size: 26px;
+      font-weight: bold;
+      color: #4caf50;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    h1 {
+      color: #008b8b;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .botao-servico {
+      background-color: #00b3b3;
+      color: #fff;
+      border: 2px solid #008b8b;
+      padding: 15px 20px;
+      border-radius: 30px;
+      font-size: 18px;
+      margin: 10px 0;
+      width: 80%;
+      max-width: 320px;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+      user-select: none;
+      border: none;
+    }
+    .botao-servico i {
+      margin-right: 10px;
+    }
+    .botao-servico:hover {
+      background-color: #009999;
+    }
+    .botao-servico.selecionado {
+      background-color: #006666 !important;
+      color: #fff !important;
+    }
+    .sub-itens, .submenu, .subsubmenu {
+      width: 100%;
+      max-width: 320px;
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      padding-left: 20px;
+    }
+    .sub-itens .botao-servico,
+    .submenu .botao-servico,
+    .subsubmenu .botao-servico {
+      background-color: #00b3b3;
+      color: white;
+      width: 90%;
+      margin-left: 10%;
+      border-radius: 20px;
+      transition: background-color 0.3s ease;
+      justify-content: space-between;
+      border: none;
+      font-size: 16px;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+    .sub-itens .botao-servico.ativo,
+    .submenu .botao-servico.ativo,
+    .subsubmenu .botao-servico.ativo {
+      background-color: #008080 !important;
+      color: white !important;
+    }
+    .linha-peso-valor {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 6px 0;
+      width: 90%;
+      margin-left: 10%;
+    }
+    .linha-peso-valor input[type="text"], 
+    .linha-peso-valor input[type="number"] {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #008b8b;
+      flex: 1;
+      font-size: 14px;
+    }
+    .btn-add {
+      margin-left: 10%;
+      margin-top: 10px;
+      background-color: #008b8b;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      width: fit-content;
+      user-select: none;
+    }
+    .btn-remove {
+      background-color: #cc3333;
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+      user-select: none;
+    }
+    /* Redes sociais */
+    .redes {
+      margin-top: 40px;
+      display: flex;
+      gap: 20px;
+    }
+    .redes a {
+      font-size: 24px;
+      color: #008b8b;
+      text-decoration: none;
+    }
+    #calculadora, #ajuda-rapida {
+      width: 100%;
+      max-width: 320px;
+      background: #00b3b3;
+      padding: 20px;
+      border-radius: 20px;
+      color: white;
+      display: none;
+      flex-direction: column;
+      margin-bottom: 20px;
+    }
+    #calculadora label, #calculadora select, #calculadora input, #calculadora button,
+    #ajuda-rapida input, #ajuda-rapida button {
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    #calculadora input, #calculadora select, #ajuda-rapida input {
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    #calculadora button, #ajuda-rapida button {
+      background: #008b8b;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 10px;
+      transition: background 0.3s ease;
+    }
+    #calculadora button:hover, #ajuda-rapida button:hover {
+      background: #006666;
+    }
+    #resultado, #resultado-ajuda {
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 10px;
+      min-height: 24px;
+      color: white;
+      white-space: pre-line;
+    }
+    #ajuda-rapida {
+      min-height: 100px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    /* Tela de login */
+    #login-container {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      flex-direction: column;
+    }
+    #login-box {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      width: 300px;
+      text-align: center;
+    }
+    #login-box h2 {
+      margin-bottom: 20px;
+      color: #008b8b;
+    }
+    #senha-login {
+      width: 100%;
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 1px solid #008b8b;
+      margin-bottom: 15px;
+    }
+    #btn-login {
+      background-color: #008b8b;
+      border: none;
+      color: white;
+      padding: 12px;
+      width: 100%;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    #btn-login:hover {
+      background-color: #006666;
+    }
+    #login-msg {
+      color: red;
+      margin-top: 10px;
+      min-height: 20px;
+      font-weight: bold;
+    }
+    #btn-logout {
+      margin-top: 20px;
+      background-color: #cc3333;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      display: none;
+      width: 100px;
+      align-self: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Tela de Login -->
+  <div id="login-container">
+    <div id="login-box">
+      <h2>Login</h2>
+      <input type="password" id="senha-login" placeholder="Digite a senha" />
+      <button id="btn-login">Entrar</button>
+      <div id="login-msg"></div>
+    </div>
+  </div>
+
+  <!-- Conteúdo principal do app -->
+  <div class="overlay" id="main-app">
+    <div class="topo">CLINVET CLÍNICA VETERINÁRIA</div>
+    <h1>Nossos Serviços</h1>
+
+    <!-- Botão Logout -->
+    <button id="btn-logout">Sair</button>
+
+    <!-- Botões principais -->
+    <div class="botao-servico" onclick="toggleConsulta()" id="btn-consulta">
+      <i class="fas fa-user-md"></i> Consulta
+    </div>
+
+    <div class="botao-servico" onclick="toggleCastracao()" id="btn-castracao">
+      <i class="fas fa-cut"></i> Castração
+    </div>
+
+    <div class="botao-servico" onclick="toggleVacinas()" id="btn-vacinas">
+      <i class="fas fa-syringe"></i> Vacinas
+    </div>
+
+    <div class="botao-servico" onclick="toggleCalculadora()" id="btn-calculadora">
+      <i class="fas fa-calculator"></i> Dose por Peso
+    </div>
+
+    <div class="botao-servico" onclick="toggleAjudaRapida()" id="btn-ajuda-rapida">
+      <i class="fas fa-stethoscope"></i> Ajuda Rápida
+    </div>
+
+    <!-- Consulta -->
+    <div id="consulta-opcoes" class="sub-itens">
+      <div class="botao-servico">
+        Consulta
+        <input type="number" id="valor-consulta" placeholder="Valor R$" />
+      </div>
+      <div class="botao-servico">
+        A domicílio
+        <input type="number" id="valor-domicilio" placeholder="Valor R$" />
+      </div>
+    </div>
+
+    <!-- Castração -->
+    <div id="castracao-opcoes" class="sub-itens">
+      <!-- Orquiectomia -->
+      <button class="botao-servico" id="btn-orquiectomia">
+        <i class="fas fa-mars"></i>&nbsp;Orquiectomia
+      </button>
+      <div class="submenu" id="submenu-orquiectomia">
+
+        <button class="botao-servico" id="btn-cachorro">
+          <i class="fas fa-dog"></i>&nbsp;Cachorro
+        </button>
+        <div class="subsubmenu" id="subsubmenu-cachorro">
+          <div id="lista-cachorro"></div>
+          <button class="btn-add" onclick="adicionarLinha('cachorro')">+ Adicionar peso e valor</button>
+        </div>
+
+        <button class="botao-servico" id="btn-gato">
+          <i class="fas fa-cat"></i>&nbsp;Gato
+        </button>
+        <div class="subsubmenu" id="subsubmenu-gato">
+          <div id="lista-gato"></div>
+          <button class="btn-add" onclick="adicionarLinha('gato')">+ Adicionar peso e valor</button>
+        </div>
+
+      </div>
+
+      <!-- Ovariectomia -->
+      <button class="botao-servico" id="btn-ovariectomia">
+        <i class="fas fa-venus"></i>&nbsp;Ovariectomia
+      </button>
+      <div class="submenu" id="submenu-ovariectomia">
+
+        <button class="botao-servico" id="btn-cachorra">
+          <i class="fas fa-dog"></i>&nbsp;Cachorra
+        </button>
+        <div class="subsubmenu" id="subsubmenu-cachorra">
+          <div id="lista-cachorra"></div>
+          <button class="btn-add" onclick="adicionarLinha('cachorra')">+ Adicionar peso e valor</button>
+        </div>
+
+        <button class="botao-servico" id="btn-gata">
+          <i class="fas fa-cat"></i>&nbsp;Gata
+        </button>
+        <div class="subsubmenu" id="subsubmenu-gata">
+          <div id="lista-gata"></div>
+          <button class="btn-add" onclick="adicionarLinha('gata')">+ Adicionar peso e valor</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Vacinas -->
+    <div id="vacinas-opcoes" class="sub-itens">
+      <div class="botao-servico" onclick="toggleVacinasCachorro()" id="btn-vacinas-cachorro">
+        <i class="fas fa-dog"></i> Cachorro
+      </div>
+      <div id="vacinas-cachorro" class="sub-itens">
+        <div id="lista-vacinas-cachorro"></div>
+        <button class="btn-add" onclick="adicionarLinhaVacina('lista-vacinas-cachorro')">+ Adicionar peso e valor</button>
+      </div>
+      <div class="botao-servico" onclick="toggleVacinasGato()" id="btn-vacinas-gato">
+        <i class="fas fa-cat"></i> Gato
+      </div>
+      <div id="vacinas-gato" class="sub-itens">
+        <div id="lista-vacinas-gato"></div>
+        <button class="btn-add" onclick="adicionarLinhaVacina('lista-vacinas-gato')">+ Adicionar peso e valor</button>
+      </div>
+    </div>
+
+    <!-- Calculadora de Dose -->
+    <div id="calculadora">
+      <label for="peso">Peso do pet (kg):</label>
+      <input type="number" id="peso" min="0" step="0.1" placeholder="Ex: 12.5" />
+
+      <label for="medicamento">Selecione o medicamento:</label>
+      <select id="medicamento">
+        <option value="">-- Escolha --</option>
+        <option value="med1" data-dose="0.2">Medicamento A (0,2 ml/kg)</option>
+        <option value="med2" data-dose="0.5">Medicamento B (0,5 ml/kg)</option>
+        <option value="med3" data-dose="1.0">Medicamento C (1 ml/kg)</option>
+      </select>
+
+      <button onclick="calcularDose()">Calcular Dose</button>
+      <div id="resultado"></div>
+    </div>
+
+    <!-- Ajuda Rápida -->
+    <div id="ajuda-rapida">
+      <input type="text" id="sintoma" placeholder="Descreva o sintoma do pet (ex: vomitando)" />
+      <button onclick="buscarDiagnostico()">Buscar Diagnóstico</button>
+      <div id="resultado-ajuda"></div>
+    </div>
+
+    <div class="redes">
+      <a href="https://wa.me/seunumerodowhatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+      <a href="https://instagram.com/seuusuario" target="_blank"><i class="fab fa-instagram"></i></a>
+    </div>
+  </div>
+
+  <script>
+    // Senha correta
+    const senhaCorreta = '@2050';
+
+    const loginContainer = document.getElementById('login-container');
+    const mainApp = document.getElementById('main-app');
+    const btnLogin = document.getElementById('btn-login');
+    const inputSenha = document.getElementById('senha-login');
+    const loginMsg = document.getElementById('login-msg');
+    const btnLogout = document.getElementById('btn-logout');
+
+    // Verifica se usuário já está logado via sessionStorage
+    function checarLogin() {
+      if (sessionStorage.getItem('logado') === 'true') {
+        loginContainer.style.display = 'none';
+        mainApp.style.display = 'flex';
+        btnLogout.style.display = 'block';
+      } else {
+        loginContainer.style.display = 'flex';
+        mainApp.style.display = 'none';
+        btnLogout.style.display = 'none';
+      }
+    }
+
+    btnLogin.addEventListener('click', () => {
+      const senha = inputSenha.value;
+      if (senha === senhaCorreta) {
+        sessionStorage.setItem('logado', 'true');
+        loginMsg.textContent = '';
+        inputSenha.value = '';
+        checarLogin();
+      } else {
+        loginMsg.textContent = 'Senha incorreta! Tente novamente.';
+      }
+    });
+
+    // Permitir Enter para login
+    inputSenha.addEventListener('keyup', e => {
+      if (e.key === 'Enter') btnLogin.click();
+    });
+
+    // Logout
+    btnLogout.addEventListener('click', () => {
+      sessionStorage.removeItem('logado');
+      checarLogin();
+    });
+
+    // Checa login na inicialização da página
+    checarLogin();
+
+
+    // ... (restante do código já existente para menus, toggle, etc.) ...
+
+    function closeAllSubmenus() {
+      const submenus = [
+        'consulta-opcoes', 'castracao-opcoes', 'vacinas-opcoes',
+        'vacinas-cachorro', 'vacinas-gato', 'calculadora', 'ajuda-rapida',
+        'submenu-orquiectomia', 'submenu-ovariectomia',
+        'subsubmenu-cachorro', 'subsubmenu-gato',
+        'subsubmenu-cachorra', 'subsubmenu-gata'
+      ];
+      submenus.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      limparSelecoes();
+    }
+
+    function limparSelecoes() {
+      document.querySelectorAll('.botao-servico.selecionado').forEach(el => el.classList.remove('selecionado'));
+      document.querySelectorAll('.botao-servico.ativo').forEach(el => el.classList.remove('ativo'));
+    }
+
+    function toggleMenu(menuId, botaoPrincipalId) {
+      const menu = document.getElementById(menuId);
+      const botaoPrincipal = document.getElementById(botaoPrincipalId);
+      const botoesSubmenu = menu.querySelectorAll('.botao-servico');
+
+      const isAberto = menu.style.display === 'flex';
+
+      closeAllSubmenus();
+
+      if (!isAberto) {
+        menu.style.display = 'flex';
+        botaoPrincipal.classList.add('selecionado');
+        botoesSubmenu.forEach(botao => botao.classList.add('ativo'));
+      } else {
+        menu.style.display = 'none';
+      }
+    }
+
+    function toggleConsulta() {
+      toggleMenu('consulta-opcoes', 'btn-consulta');
+    }
+    function toggleCastracao() {
+      toggleMenu('castracao-opcoes', 'btn-castracao');
+    }
+
+    function toggleVacinas() {
+      const vacinas = document.getElementById('vacinas-opcoes');
+      const btn = document.getElementById('btn-vacinas');
+      const isOpen = vacinas.style.display === 'flex';
+      if (isOpen) {
+        vacinas.style.display = 'none';
+        btn.classList.remove('selecionado');
+      } else {
+        vacinas.style.display = 'flex';
+        btn.classList.add('selecionado');
+      }
+    }
+
+    function toggleVacinasCachorro() {
+      const vacCachorro = document.getElementById('vacinas-cachorro');
+      const btn = document.getElementById('btn-vacinas-cachorro');
+      const isOpen = vacCachorro.style.display === 'flex';
+      if (isOpen) {
+        vacCachorro.style.display = 'none';
+        btn.classList.remove('ativo');
+      } else {
+        vacCachorro.style.display = 'flex';
+        vacCachorro.style.flexDirection = 'column';
+        btn.classList.add('ativo');
+      }
+    }
+
+    function toggleVacinasGato() {
+      const vacGato = document.getElementById('vacinas-gato');
+      const btn = document.getElementById('btn-vacinas-gato');
+      const isOpen = vacGato.style.display === 'flex';
+      if (isOpen) {
+        vacGato.style.display = 'none';
+        btn.classList.remove('ativo');
+      } else {
+        vacGato.style.display = 'flex';
+        vacGato.style.flexDirection = 'column';
+        btn.classList.add('ativo');
+      }
+    }
+
+    function toggleCalculadora() {
+      toggleMenu('calculadora', 'btn-calculadora');
+    }
+    function toggleAjudaRapida() {
+      toggleMenu('ajuda-rapida', 'btn-ajuda-rapida');
+    }
+
+    document.getElementById('btn-orquiectomia').addEventListener('click', () => {
+      toggleDisplay('submenu-orquiectomia');
+    });
+    document.getElementById('btn-cachorro').addEventListener('click', () => {
+      toggleDisplay('subsubmenu-cachorro');
+    });
+    document.getElementById('btn-gato').addEventListener('click', () => {
+      toggleDisplay('subsubmenu-gato');
+    });
+    document.getElementById('btn-ovariectomia').addEventListener('click', () => {
+      toggleDisplay('submenu-ovariectomia');
+    });
+    document.getElementById('btn-cachorra').addEventListener('click', () => {
+      toggleDisplay('subsubmenu-cachorra');
+    });
+    document.getElementById('btn-gata').addEventListener('click', () => {
+      toggleDisplay('subsubmenu-gata');
+    });
+
+    function toggleDisplay(id) {
+      const el = document.getElementById(id);
+      if (el.style.display === 'flex' || el.style.display === 'block') {
+        el.style.display = 'none';
+      } else {
+        el.style.display = 'flex';
+        el.style.flexDirection = 'column';
+      }
+    }
+
+    // Função para adicionar linha peso e valor para castração
+    function adicionarLinha(tipo) {
+      const lista = document.getElementById('lista-' + tipo);
+      const linha = document.createElement('div');
+      linha.classList.add('linha-peso-valor');
+
+      const inputPeso = document.createElement('input');
+      inputPeso.type = 'text';
+      inputPeso.placeholder = 'Faixa de peso (ex: 5-10 kg)';
+      inputPeso.classList.add('input-peso');
+
+      const inputValor = document.createElement('input');
+      inputValor.type = 'number';
+      inputValor.min = '0';
+      inputValor.step = '0.01';
+      inputValor.placeholder = 'Valor R$';
+      inputValor.classList.add('input-valor');
+
+      const btnRemover = document.createElement('button');
+      btnRemover.textContent = 'x';
+      btnRemover.classList.add('btn-remove');
+      btnRemover.title = 'Remover';
+      btnRemover.onclick = () => {
+        lista.removeChild(linha);
+      };
+
+      linha.appendChild(inputPeso);
+      linha.appendChild(inputValor);
+      linha.appendChild(btnRemover);
+
+      lista.appendChild(linha);
+    }
+
+    // Função para adicionar linha peso e valor para Vacinas
+    function adicionarLinhaVacina(listaId) {
+      const lista = document.getElementById(listaId);
+      const linha = document.createElement('div');
+      linha.classList.add('linha-peso-valor');
+
+      const inputPeso = document.createElement('input');
+      inputPeso.type = 'text';
+      inputPeso.placeholder = 'Faixa de peso (ex: 5-10 kg)';
+      inputPeso.classList.add('input-peso');
+
+      const inputValor = document.createElement('input');
+      inputValor.type = 'number';
+      inputValor.min = '0';
+      inputValor.step = '0.01';
+      inputValor.placeholder = 'Valor R$';
+      inputValor.classList.add('input-valor');
+
+      const btnRemover = document.createElement('button');
+      btnRemover.textContent = 'x';
+      btnRemover.classList.add('btn-remove');
+      btnRemover.title = 'Remover';
+      btnRemover.onclick = () => {
+        lista.removeChild(linha);
+      };
+
+      linha.appendChild(inputPeso);
+      linha.appendChild(inputValor);
+      linha.appendChild(btnRemover);
+
+      lista.appendChild(linha);
+    }
+
+    // Função de calculadora dose por peso (exemplo)
+    function calcularDose() {
+      const peso = parseFloat(document.getElementById('peso').value);
+      const select = document.getElementById('medicamento');
+      const dosePorKg = parseFloat(select.options[select.selectedIndex].getAttribute('data-dose'));
+      const resultado = document.getElementById('resultado');
+
+      if (!peso || peso <= 0) {
+        resultado.textContent = 'Por favor, informe um peso válido.';
+        return;
+      }
+      if (!dosePorKg || isNaN(dosePorKg)) {
+        resultado.textContent = 'Por favor, selecione um medicamento.';
+        return;
+      }
+
+      const dose = peso * dosePorKg;
+      resultado.textContent = `Dose recomendada: ${dose.toFixed(2)} ml`;
+    }
+
+    // Função de ajuda rápida (exemplo simples)
+    function buscarDiagnostico() {
+      const sintoma = document.getElementById('sintoma').value.toLowerCase().trim();
+      const resultadoAjuda = document.getElementById('resultado-ajuda');
+      if (!sintoma) {
+        resultadoAjuda.textContent = 'Descreva um sintoma para buscar.';
+        return;
+      }
+      // Exemplos simples de diagnósticos
+      if (sintoma.includes('vomito') || sintoma.includes('vômito')) {
+        resultadoAjuda.textContent = 'Pode ser intoxicação alimentar ou infecção gastrointestinal. Procure um veterinário!';
+      } else if (sintoma.includes('diarreia')) {
+        resultadoAjuda.textContent = 'Possível infecção intestinal. Mantenha o pet hidratado e consulte o veterinário.';
+      } else {
+        resultadoAjuda.textContent = 'Sintoma não reconhecido. Consulte um veterinário para diagnóstico correto.';
+      }
+    }
+  </script>
+</body>
+</html>
